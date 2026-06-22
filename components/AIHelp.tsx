@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useResponsive } from "@/components/useResponsive";
 
 type TutorPage = "home" | "simulation" | "explanation" | "quiz";
 
@@ -26,7 +27,7 @@ const helpOptions: Record<TutorPage, { label: string; response: string }[]> = {
   ],
   explanation: [
     { label: "Simplify this explanation", response: "Direct proportion means both things go up together. More apples means more cost. Inverse means one goes up while the other goes down. More workers means fewer days." },
-    { label: "Explain like I am 10", response: "Imagine apples in a basket. If each apple costs the same, buying more apples costs more money — that is direct proportion. Now imagine people building a house. If more people help, it finishes faster — that is inverse proportion." },
+    { label: "Explain like I am 10", response: "Imagine apples in a basket. If each apple costs the same, buying more apples costs more money — that is direct proportion. If more people help build a house, it finishes faster — that is inverse proportion." },
     { label: "Summarize in one sentence", response: "Direct proportion means two values move together; inverse proportion means they move in opposite directions." },
     { label: "Give me exam wording", response: "If y is directly proportional to x, then y = kx. If y is inversely proportional to x, then y = k / x, where k is the constant of proportionality." },
   ],
@@ -41,11 +42,11 @@ const helpOptions: Record<TutorPage, { label: string; response: string }[]> = {
 export default function AIHelp({ page }: { page: TutorPage }) {
   const [isOpen, setIsOpen] = useState(false);
   const [response, setResponse] = useState(greetings[page]);
+  const { isMobile } = useResponsive();
   const options = helpOptions[page];
 
   return (
     <>
-      {/* Floating button — warm orange, matches site palette */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
@@ -53,13 +54,12 @@ export default function AIHelp({ page }: { page: TutorPage }) {
           className="animate-bob"
           style={{
             position: "fixed",
-            bottom: 24,
-            right: 24,
+            bottom: isMobile ? 16 : 24,
+            right: isMobile ? 16 : 24,
             zIndex: 50,
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            padding: "12px 20px 12px 14px",
+            display: "flex", alignItems: "center",
+            gap: isMobile ? 8 : 10,
+            padding: isMobile ? "10px 16px 10px 12px" : "12px 20px 12px 14px",
             borderRadius: 999,
             background: "#fff",
             border: "1.5px solid rgba(30,35,51,0.13)",
@@ -67,33 +67,21 @@ export default function AIHelp({ page }: { page: TutorPage }) {
             cursor: "pointer",
             fontFamily: "'Nunito', system-ui",
             fontWeight: 800,
-            fontSize: 15,
+            fontSize: isMobile ? 13 : 15,
             color: "#1e2333",
-            transition: "transform .2s ease, box-shadow .2s ease",
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.transform = "translateY(-3px)";
-            (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 22px rgba(30,35,51,.12), 0 18px 40px rgba(30,35,51,.12)";
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.transform = "";
-            (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 14px rgba(30,35,51,.10), 0 12px 32px rgba(30,35,51,.10)";
           }}
         >
           <span style={{
-            width: 34, height: 34, borderRadius: "50%",
-            background: "#fff3e6",
+            width: isMobile ? 28 : 34, height: isMobile ? 28 : 34,
+            borderRadius: "50%", background: "#fff3e6",
             border: "1.5px solid rgba(249,115,22,.2)",
             display: "grid", placeItems: "center",
-            fontSize: 18, flexShrink: 0,
-          }}>
-            🧑‍🏫
-          </span>
+            fontSize: isMobile ? 15 : 18, flexShrink: 0,
+          }}>🧑‍🏫</span>
           Your Tutor
         </button>
       )}
 
-      {/* Panel */}
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
@@ -101,25 +89,29 @@ export default function AIHelp({ page }: { page: TutorPage }) {
             position: "fixed", inset: 0, zIndex: 50,
             background: "rgba(30,35,51,.18)",
             display: "flex", alignItems: "flex-end", justifyContent: "flex-end",
-            padding: "0 24px 24px",
+            padding: isMobile ? "0 0 0 0" : "0 24px 24px",
           }}
         >
           <div
             className="animate-slide-up card"
             onClick={e => e.stopPropagation()}
-            style={{ width: "100%", maxWidth: 420, padding: 22 }}
+            style={{
+              width: "100%",
+              maxWidth: isMobile ? "100%" : 420,
+              padding: isMobile ? "20px 16px 28px" : 22,
+              borderRadius: isMobile ? "20px 20px 0 0" : 20,
+              maxHeight: isMobile ? "85vh" : "none",
+              overflowY: "auto",
+            }}
           >
             {/* Header */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: 14,
-                  background: "#fff3e6",
-                  border: "1.5px solid rgba(249,115,22,.18)",
+                  background: "#fff3e6", border: "1.5px solid rgba(249,115,22,.18)",
                   display: "grid", placeItems: "center", fontSize: 22, flexShrink: 0,
-                }}>
-                  🧑‍🏫
-                </div>
+                }}>🧑‍🏫</div>
                 <div>
                   <p className="eyebrow" style={{ color: "#f97316" }}>Your Tutor</p>
                   <h2 style={{ fontSize: 18, fontWeight: 800, marginTop: 2 }}>Need a hand?</h2>
@@ -133,13 +125,8 @@ export default function AIHelp({ page }: { page: TutorPage }) {
                   background: "#f1f5f9", border: "none",
                   cursor: "pointer", fontSize: 16, color: "#64748b",
                   display: "grid", placeItems: "center",
-                  transition: "background .15s",
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = "#e2e8f0")}
-                onMouseLeave={e => (e.currentTarget.style.background = "#f1f5f9")}
-              >
-                ×
-              </button>
+              >×</button>
             </div>
 
             {/* Options */}
@@ -152,17 +139,10 @@ export default function AIHelp({ page }: { page: TutorPage }) {
                     textAlign: "left", padding: "10px 14px",
                     borderRadius: 12, border: "1.5px solid rgba(249,115,22,.15)",
                     background: "#fff8f3", color: "#a85820",
-                    fontFamily: "'Inter', system-ui", fontWeight: 600, fontSize: 14,
+                    fontFamily: "'Inter', system-ui", fontWeight: 600,
+                    fontSize: isMobile ? 13 : 14,
                     cursor: "pointer",
-                    transition: "background .15s, transform .15s",
-                  }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.background = "#fff0e0";
-                    (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.background = "#fff8f3";
-                    (e.currentTarget as HTMLElement).style.transform = "";
+                    transition: "background .15s",
                   }}
                 >
                   {option.label}
@@ -170,18 +150,17 @@ export default function AIHelp({ page }: { page: TutorPage }) {
               ))}
             </div>
 
-            {/* Response box */}
+            {/* Response */}
             <div style={{
               marginTop: 16, padding: "14px 16px",
               borderRadius: 14, background: "#fffaf3",
               border: "1.5px solid rgba(249,115,22,.12)",
             }}>
               <p className="eyebrow" style={{ color: "#94a3b8" }}>Tutor says</p>
-              <p
-                key={response}
-                className="animate-rise"
-                style={{ marginTop: 8, fontSize: 15, fontWeight: 500, lineHeight: 1.7, color: "#374151" }}
-              >
+              <p key={response} className="animate-rise" style={{
+                marginTop: 8, fontSize: isMobile ? 14 : 15,
+                fontWeight: 500, lineHeight: 1.7, color: "#374151",
+              }}>
                 {response}
               </p>
             </div>
@@ -195,3 +174,4 @@ export default function AIHelp({ page }: { page: TutorPage }) {
     </>
   );
 }
+
