@@ -1,26 +1,169 @@
+
 @import "tailwindcss";
 
+/* ─── NOTE ────────────────────────────────────────────────────────────────
+   If your project is Tailwind v3, replace the `@import "tailwindcss";`
+   line above with the three classic directives:
+       @tailwind base;
+       @tailwind components;
+       @tailwind utilities;
+   Keep everything below unchanged.
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* ─── Global tokens ──────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink:       #1e2333;
+  --muted:     #64748b;
+  --line:      rgba(30, 35, 51, 0.09);
+  --line-med:  rgba(30, 35, 51, 0.14);
+  --cream:     #fffaf3;
+  --cream2:    #fff3e6;
+
+  /* Shadows — soft, layered */
+  --sh:    0 1px 3px rgba(30,35,51,.05), 0 4px 14px rgba(30,35,51,.07);
+  --sh-lg: 0 6px 16px rgba(30,35,51,.08), 0 20px 40px rgba(30,35,51,.11);
+  --sh-sm: 0 1px 2px rgba(30,35,51,.04), 0 2px 6px rgba(30,35,51,.06);
+
+  /* Accent palette */
+  --orange: #f97316;
+  --red:    #f76c5e;  --red-t:    #fff1ef;  --red-ink:    #a83228;
+  --amber:  #f4b740;  --amber-t:  #fef6e3;  --amber-ink:  #8a5e00;
+  --green:  #2ec47a;  --green-t:  #e8f9f1;  --green-ink:  #196b44;
+  --blue:   #5a8ee8;  --blue-t:   #edf2fd;  --blue-ink:   #2a4fa0;
+  --purple: #7c6ef0;  --purple-t: #f0eefe;  --purple-ink: #4a3db8;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* ─── Base ───────────────────────────────────────────────────────────── */
+html  { scroll-behavior: smooth; }
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--cream) 0%, var(--cream2) 100%);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Nunito', ui-rounded, system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* ─── Surface system ─────────────────────────────────────────────────── */
+
+/* Default card — white, visible border, soft shadow */
+.card {
+  background: #fff;
+  border: 1.5px solid var(--line-med);
+  border-radius: 20px;
+  box-shadow: var(--sh);
+}
+
+/* Subtle tinted chip (formula bars, tags) */
+.chip {
+  background: var(--cream2);
+  border: 1.5px solid rgba(249,115,22,.15);
+  border-radius: 16px;
+}
+
+/* Eyebrow label */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+/* ─── Interactive states ─────────────────────────────────────────────── */
+
+/* Clickable card lift — always add cursor-pointer too */
+.card-link {
+  cursor: pointer;
+  transition: transform .26s cubic-bezier(.22,1,.36,1),
+              box-shadow .26s ease,
+              border-color .2s ease;
+}
+.card-link:hover  { transform: translateY(-4px); box-shadow: var(--sh-lg); border-color: var(--line-med); }
+.card-link:active { transform: translateY(-1px);  box-shadow: var(--sh); }
+
+/* Generic button base */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-weight: 700;
+  border-radius: 12px;
+  border: 1.5px solid var(--line-med);
+  background: #fff;
+  color: var(--ink);
+  box-shadow: var(--sh-sm);
+  transition: transform .18s ease,
+              box-shadow .18s ease,
+              background-color .16s ease,
+              border-color .16s ease;
+}
+.btn:hover  { transform: translateY(-2px); box-shadow: var(--sh); }
+.btn:active { transform: translateY(0);    box-shadow: var(--sh-sm); }
+.btn:disabled { opacity: .42; cursor: not-allowed; transform: none; }
+
+/* Filled accent button variants */
+.btn-orange { background: var(--orange);  border-color: rgba(249,115,22,.4); color: #fff; }
+.btn-green  { background: var(--green);   border-color: rgba(46,196,122,.4); color: #fff; }
+.btn-blue   { background: var(--blue);    border-color: rgba(90,142,232,.4); color: #fff; }
+.btn-purple { background: var(--purple);  border-color: rgba(124,110,240,.4); color: #fff; }
+.btn-red    { background: var(--red);     border-color: rgba(247,108,94,.4); color: #fff; }
+
+/* ─── Animations ─────────────────────────────────────────────────────── */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+.animate-rise { opacity: 0; animation: rise .5s cubic-bezier(.22,1,.36,1) forwards; }
+
+@keyframes pop {
+  0%   { transform: scale(.88); }
+  60%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+.animate-pop { animation: pop .26s ease-out; }
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px) scale(.98); }
+  to   { opacity: 1; transform: none scale(1); }
+}
+.animate-slide-up { animation: slide-up .3s cubic-bezier(.22,1,.36,1); }
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-5px); }
+}
+.animate-bob { animation: bob 2.8s ease-in-out infinite; }
+
+@keyframes confetti-fall {
+  0%   { transform: translateY(-10vh) rotate(0deg);   opacity: 1; }
+  100% { transform: translateY(110vh) rotate(700deg); opacity: 0; }
+}
+.confetti-piece {
+  position: fixed; top: 0; width: 10px; height: 15px;
+  border-radius: 3px; z-index: 60; pointer-events: none;
+  animation: confetti-fall linear forwards;
+}
+
+/* Range slider */
+input[type="range"] {
+  cursor: pointer;
+  accent-color: var(--orange);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
 }
