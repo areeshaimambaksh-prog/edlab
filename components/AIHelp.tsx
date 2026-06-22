@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useResponsive } from "@/components/useResponsive";
 
 type TutorPage = "home" | "simulation" | "explanation" | "quiz";
@@ -45,38 +45,111 @@ export default function AIHelp({ page }: { page: TutorPage }) {
   const { isMobile } = useResponsive();
   const options = helpOptions[page];
 
+  // Draggable position state
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const dragging = useRef(false);
+  const dragOffset = useRef({ x: 0, y: 0 });
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const hasDragged = useRef(false);
+
+  // Set initial position once on mount
+  useEffect(() => {
+    setPos(null); // reset to default CSS bottom-right
+  }, []);
+
+  const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    dragging.current = true;
+    hasDragged.current = false;
+    const rect = e.currentTarget.getBoundingClientRect();
+    dragOffset.current = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
+    e.currentTarget.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (!dragging.current) return;
+    hasDragged.current = true;
+    const x = e.clientX - dragOffset.current.x;
+    const y = e.clientY - dragOffset.current.y;
+    // Clamp within viewport
+    const btn = btnRef.current;
+    if (!btn) return;
+    const w = btn.offsetWidth;
+    const h = btn.offsetHeight;
+    setPos({
+      x: Math.max(8, Math.min(window.innerWidth - w - 8, x)),
+      y: Math.max(8, Math.min(window.innerHeight - h - 8, y)),
+    });
+    e.preventDefault();
+  };
+
+  const onPointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
+    dragging.current = false;
+    // Only open if it was a tap, not a drag
+    if (!hasDragged.current) {
+      setIsOpen(true);
+    }
+  };
+
+  const buttonStyle: React.CSSProperties = pos
+    ? {
+        position: "fixed",
+        left: pos.x,
+        top: pos.y,
+        bottom: "auto",
+        right: "auto",
+        zIndex: 50,
+        touchAction: "none",
+      }
+    : {
+        position: "fixed",
+        bottom: isMobile ? 100 : 24,
+        right: isMobile ? 16 : 24,
+        zIndex: 50,
+        touchAction: "none",
+      };
+
   return (
     <>
       {!isOpen && (
         <button
-          onClick={() => setIsOpen(true)}
+          ref={btnRef}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
           aria-label="Open your tutor"
           className="animate-bob"
           style={{
-            position: "fixed",
-            bottom: isMobile ? 16 : 24,
-            right: isMobile ? 16 : 24,
-            zIndex: 50,
-            display: "flex", alignItems: "center",
+            ...buttonStyle,
+            display: "flex",
+            alignItems: "center",
             gap: isMobile ? 8 : 10,
             padding: isMobile ? "10px 16px 10px 12px" : "12px 20px 12px 14px",
             borderRadius: 999,
             background: "#fff",
             border: "1.5px solid rgba(30,35,51,0.13)",
             boxShadow: "0 4px 14px rgba(30,35,51,.10), 0 12px 32px rgba(30,35,51,.10)",
-            cursor: "pointer",
+            cursor: "grab",
             fontFamily: "'Nunito', system-ui",
             fontWeight: 800,
             fontSize: isMobile ? 13 : 15,
             color: "#1e2333",
+            userSelect: "none",
           }}
         >
           <span style={{
-            width: isMobile ? 28 : 34, height: isMobile ? 28 : 34,
-            borderRadius: "50%", background: "#fff3e6",
+            width: isMobile ? 28 : 34,
+            height: isMobile ? 28 : 34,
+            borderRadius: "50%",
+            background: "#fff3e6",
             border: "1.5px solid rgba(249,115,22,.2)",
-            display: "grid", placeItems: "center",
-            fontSize: isMobile ? 15 : 18, flexShrink: 0,
+            display: "grid",
+            placeItems: "center",
+            fontSize: isMobile ? 15 : 18,
+            flexShrink: 0,
           }}>🧑‍🏫</span>
           Your Tutor
         </button>
@@ -89,7 +162,7 @@ export default function AIHelp({ page }: { page: TutorPage }) {
             position: "fixed", inset: 0, zIndex: 50,
             background: "rgba(30,35,51,.18)",
             display: "flex", alignItems: "flex-end", justifyContent: "flex-end",
-            padding: isMobile ? "0 0 0 0" : "0 24px 24px",
+            padding: isMobile ? "0" : "0 24px 24px",
           }}
         >
           <div
@@ -98,13 +171,17 @@ export default function AIHelp({ page }: { page: TutorPage }) {
             style={{
               width: "100%",
               maxWidth: isMobile ? "100%" : 420,
-              padding: isMobile ? "20px 16px 28px" : 22,
+              padding: isMobile ? "20px 16px 32px" : 22,
               borderRadius: isMobile ? "20px 20px 0 0" : 20,
               maxHeight: isMobile ? "85vh" : "none",
               overflowY: "auto",
             }}
           >
-            {/* Header */}
+            {/* Mobile drag handle */}
+            {isMobile && (
+              <div style={{ width: 40, height: 4, borderRadius: 999, background: "#e2e8f0", margin: "0 auto 16px" }} />
+            )}
+
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{
@@ -129,7 +206,6 @@ export default function AIHelp({ page }: { page: TutorPage }) {
               >×</button>
             </div>
 
-            {/* Options */}
             <div style={{ marginTop: 18, display: "grid", gap: 8 }}>
               {options.map(option => (
                 <button
@@ -150,7 +226,6 @@ export default function AIHelp({ page }: { page: TutorPage }) {
               ))}
             </div>
 
-            {/* Response */}
             <div style={{
               marginTop: 16, padding: "14px 16px",
               borderRadius: 14, background: "#fffaf3",
@@ -174,4 +249,3 @@ export default function AIHelp({ page }: { page: TutorPage }) {
     </>
   );
 }
-
