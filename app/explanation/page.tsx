@@ -61,7 +61,7 @@ export default function ExplanationPage() {
     <main style={{ minHeight: "100vh", color: "#1e2333" }}>
       <NavBar />
 
-      <section style={{ maxWidth: 1000, margin: "0 auto", padding: `clamp(20px,4vw,36px) clamp(16px,4vw,24px) 160px` }}>
+      <section style={{ maxWidth: 900, margin: "0 auto", padding: `clamp(20px,4vw,36px) clamp(16px,4vw,24px) 160px` }}>
 
         {/* Header */}
         <header className="card animate-rise" style={{ padding: pad }}>
@@ -79,7 +79,7 @@ export default function ExplanationPage() {
         <div style={{
           marginTop: 20,
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))",
+          gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
           gap: 16,
         }}>
           {/* Direct */}
@@ -131,7 +131,7 @@ export default function ExplanationPage() {
         <div className="card animate-rise" style={{ marginTop: 16, padding: "clamp(20px,3vw,28px)", animationDelay: "240ms" }}>
           <h2 style={{ fontSize: "clamp(18px,2.5vw,22px)", fontWeight: 800 }}>How to remember it</h2>
           <p style={{ marginTop: 8, fontSize: "clamp(13px,1.5vw,16px)", color: "#64748b" }}>Direct means together. Inverse means opposite.</p>
-          <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(200px,100%),1fr))", gap: 10 }}>
+          <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 10 }}>
             <div style={{ padding: "12px 14px", borderRadius: 12, background: "#fff1ef", border: "1.5px solid rgba(247,108,94,.18)", fontWeight: 700, color: "#a83228", fontSize: "clamp(13px,1.5vw,15px)" }}>📈 Direct: more apples → more cost</div>
             <div style={{ padding: "12px 14px", borderRadius: 12, background: "#edf2fd", border: "1.5px solid rgba(90,142,232,.18)", fontWeight: 700, color: "#2a4fa0", fontSize: "clamp(13px,1.5vw,15px)" }}>📉 Inverse: more workers → fewer days</div>
           </div>
@@ -145,7 +145,7 @@ export default function ExplanationPage() {
             Pick a difficulty. Your tutor walks you through the question one step at a time.
           </p>
 
-          <div style={{ marginTop: 18, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(160px,100%),1fr))", gap: 12 }}>
+          <div style={{ marginTop: 18, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
             {(["easy","medium","hard"] as Level[]).map(level => {
               const lvl = guidedQuestions[level];
               const isActive = activeLevel === level;
