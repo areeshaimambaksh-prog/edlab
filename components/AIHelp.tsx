@@ -240,9 +240,7 @@ export default function AIHelp({ page }: { page: TutorPage }) {
               </p>
             </div>
 
-            <p style={{ marginTop: 14, fontSize: 12, color: "#94a3b8" }}>
-              Starter version: rule-based hints. A live AI model can be connected later.
-            </p>
+
           </div>
         </div>
       )}
